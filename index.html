@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JPG & RAW Extractor</title>
+    <title>JPG Raw Select & Extract</title>
     <style>
         * {
             margin: 0;
@@ -23,16 +23,18 @@
             background: #ffffff;
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 30px;
             width: 100%;
-            max-width: 650px;
+            max-width: 750px;
+            overflow: hidden;
         }
         .title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: #1a1a2e;
             text-align: center;
-            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
         }
         .title span {
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -40,6 +42,41 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        
+        /* 탭 스타일 */
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab:hover {
+            background: #e9ecef;
+        }
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #fff;
+        }
+        
+        /* 탭 콘텐츠 */
+        .tab-content {
+            display: none;
+            padding: 25px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
         .section {
             background: #f8f9fa;
             border-radius: 12px;
@@ -64,18 +101,18 @@
             margin-bottom: 0;
         }
         .folder-label {
-            width: 90px;
-            font-size: 14px;
+            width: 80px;
+            font-size: 13px;
             font-weight: 500;
             color: #495057;
             flex-shrink: 0;
         }
         .folder-input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             color: #495057;
             background: #fff;
             transition: border-color 0.2s, box-shadow 0.2s;
@@ -86,60 +123,40 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         .browse-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .browse-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        .button-section {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .action-btn {
-            padding: 14px 32px;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .copy-btn {
-            background: linear-gradient(135deg, #11998e, #38ef7d);
-            color: white;
-            flex: 1;
-        }
-        .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
-        }
-        .reset-btn {
+            padding: 10px 16px;
             background: #e9ecef;
             color: #495057;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 70px;
         }
-        .reset-btn:hover {
+        .browse-btn:hover {
             background: #dee2e6;
         }
-        .progress-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
+        
+        /* 파일 정보 */
+        .file-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #495057;
         }
+        .file-info-label {
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        
+        /* 진행바 */
         .progress-bar-container {
             width: 100%;
-            height: 24px;
+            height: 20px;
             background: #e9ecef;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             margin-bottom: 15px;
         }
@@ -147,49 +164,81 @@
             height: 100%;
             background: linear-gradient(90deg, #11998e, #38ef7d);
             width: 0%;
-            border-radius: 12px;
-            transition: width 0.5s ease;
-            position: relative;
+            border-radius: 10px;
+            transition: width 0.3s ease;
         }
-        .progress-bar.animated {
-            animation: progressAnim 3s ease-in-out infinite;
-        }
-        @keyframes progressAnim {
-            0% { width: 0%; }
-            50% { width: 75%; }
-            100% { width: 100%; }
-        }
+        
+        /* 진행 정보 */
         .progress-info {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 20px;
         }
-        .progress-status {
+        
+        /* 버튼 섹션 */
+        .button-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .action-btn {
+            padding: 12px 30px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
             font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 100px;
+        }
+        .start-btn {
+            background: #fff;
             color: #495057;
-            font-weight: 500;
         }
-        .progress-percent {
-            font-size: 16px;
-            font-weight: 700;
-            color: #667eea;
+        .start-btn:hover {
+            background: #f8f9fa;
         }
-        .progress-detail {
+        .reset-btn {
+            background: #fff;
+            color: #495057;
+        }
+        .reset-btn:hover {
+            background: #f8f9fa;
+        }
+        .close-btn {
+            background: #fff;
+            color: #495057;
+        }
+        .close-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        /* 파일명 추출 탭 */
+        .filename-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
             font-size: 12px;
-            color: #adb5bd;
-            margin-top: 10px;
             font-family: 'SF Mono', Monaco, monospace;
+            line-height: 1.8;
+            resize: vertical;
+            background: #fff;
         }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #adb5bd;
+        .filename-textarea:focus {
+            outline: none;
+            border-color: #667eea;
         }
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
+        
+        .status-text {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 15px;
         }
+        
         .demo-badge {
             background: #ffc107;
             color: #1a1a2e;
@@ -198,54 +247,110 @@
             font-size: 11px;
             font-weight: 600;
             display: inline-block;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 11px;
+            color: #adb5bd;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div style="text-align: center;">
-            <span class="demo-badge">🎬 UI 미리보기</span>
-        </div>
-        <div class="title"><span>JPG & RAW</span> 파일 추출기</div>
-        
-        <div class="section">
-            <div class="section-title">📁 폴더 선택</div>
-            
-            <div class="folder-row">
-                <div class="folder-label">JPG 폴더</div>
-                <input type="text" class="folder-input" id="jpgFolder" placeholder="JPG 파일이 있는 폴더 선택..." readonly>
-                <button class="browse-btn" onclick="selectFolder('jpgFolder')">Browse</button>
-            </div>
-            
-            <div class="folder-row">
-                <div class="folder-label">RAW 폴더</div>
-                <input type="text" class="folder-input" id="rawFolder" placeholder="RAW 파일이 있는 폴더 선택..." readonly>
-                <button class="browse-btn" onclick="selectFolder('rawFolder')">Browse</button>
-            </div>
-            
-            <div class="folder-row">
-                <div class="folder-label">복사 대상</div>
-                <input type="text" class="folder-input" id="targetFolder" placeholder="복사할 대상 폴더 선택..." readonly>
-                <button class="browse-btn" onclick="selectFolder('targetFolder')">Browse</button>
-            </div>
+        <div class="title">
+            <span class="demo-badge">🎬 UI 미리보기</span><br>
+            <span>JPG Raw</span> Select & Extract
         </div>
         
-        <div class="button-section">
-            <button class="action-btn copy-btn" onclick="startCopy()">🚀 복사 시작</button>
-            <button class="action-btn reset-btn" onclick="resetAll()">🔄 초기화</button>
+        <!-- 탭 -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('copy')">파일 복사</div>
+            <div class="tab" onclick="switchTab('extract')">파일명 추출</div>
         </div>
         
-        <div class="section progress-section">
-            <div class="section-title">📊 진행 상황</div>
+        <!-- 파일 복사 탭 -->
+        <div id="tab-copy" class="tab-content active">
+            <div class="section">
+                <div class="section-title">📁 폴더 선택</div>
+                
+                <div class="folder-row">
+                    <div class="folder-label">jpg</div>
+                    <input type="text" class="folder-input" id="jpgFolder" placeholder="JPG 파일이 있는 폴더..." readonly>
+                    <button class="browse-btn" onclick="selectFolder('jpgFolder')">jpg</button>
+                </div>
+                
+                <div class="folder-row">
+                    <div class="folder-label">Raw_arw</div>
+                    <input type="text" class="folder-input" id="rawFolder" placeholder="RAW 파일이 있는 폴더..." readonly>
+                    <button class="browse-btn" onclick="selectFolder('rawFolder')">raw</button>
+                </div>
+                
+                <div class="folder-row">
+                    <div class="folder-label">Copy_url</div>
+                    <input type="text" class="folder-input" id="targetFolder" placeholder="복사할 대상 폴더..." readonly>
+                    <button class="browse-btn" onclick="selectFolder('targetFolder')">copy_url</button>
+                </div>
+            </div>
+            
+            <div class="file-info">
+                <span class="file-info-label">파일:</span>
+                <span id="currentFile"></span>
+            </div>
+            
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progressBar"></div>
             </div>
+            
             <div class="progress-info">
-                <div class="progress-status" id="statusText">준비 완료</div>
-                <div class="progress-percent" id="percentText">0%</div>
+                <span id="speedText">속도: 0 MB/s</span>
+                <span id="timeText">남은 시간: 계산 중...</span>
+                <span id="countText">남은 항목: 0개</span>
             </div>
-            <div class="progress-detail" id="detailText">파일을 선택해주세요</div>
+            
+            <div class="button-section">
+                <button class="action-btn start-btn" onclick="startCopy()">Start</button>
+                <button class="action-btn reset-btn" onclick="resetCopy()">초기화</button>
+                <button class="action-btn close-btn" onclick="closeApp()">Close</button>
+            </div>
+        </div>
+        
+        <!-- 파일명 추출 탭 -->
+        <div id="tab-extract" class="tab-content">
+            <div class="section">
+                <div class="section-title">📁 폴더 선택</div>
+                
+                <div class="folder-row">
+                    <div class="folder-label">선택 폴더</div>
+                    <input type="text" class="folder-input" id="extractFolder" placeholder="파일명을 추출할 폴더..." readonly>
+                    <button class="browse-btn" onclick="selectFolder('extractFolder')">찾아보기</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📋 파일명 목록</div>
+                <textarea class="filename-textarea" id="filenameList" placeholder="추출된 파일명이 여기에 표시됩니다..." readonly></textarea>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="extractProgressBar"></div>
+            </div>
+            
+            <div class="status-text" id="extractStatus">준비</div>
+            
+            <div class="button-section">
+                <button class="action-btn start-btn" onclick="extractFilenames()">파일명 추출</button>
+                <button class="action-btn reset-btn" onclick="copyToClipboard()">클립보드 복사</button>
+                <button class="action-btn close-btn" onclick="closeApp()">Close</button>
+            </div>
         </div>
         
         <div class="footer">
@@ -255,24 +360,42 @@
 
     <script>
         const samplePaths = {
-            jpgFolder: '/Users/sample/Pictures/JPG',
-            rawFolder: '/Users/sample/Pictures/RAW',
-            targetFolder: '/Users/sample/Pictures/Selected'
+            jpgFolder: 'G:\\2025_Lucynpaulsnap\\20260131 응성 거성 김이안 - 인화\\4. 원본_Jpg\\루시앤폴',
+            rawFolder: 'G:\\2025_Lucynpaulsnap\\20260131 응성 거성 김이안 - 인화\\3. Raw',
+            targetFolder: 'G:\\2025_Lucynpaulsnap\\20260131 응성 거성 김이안 - 인화\\5. 원본_Raw\\루시앤폴',
+            extractFolder: 'G:\\2025_Lucynpaulsnap\\260110 상준고객 지유은 - 화보(라이트룸)\\고객선택'
         };
+        
+        const sampleFilenames = 'A7M00024 A7M00074 A7M00087 A7M00102 A7M00116 A7M00187 A7M00195 A7M00219 A7M00283 A7M00307 A7M00331 A7M00335 A7M00340 A7M00416 A7M00434 A7M00451 A7M00561 A7M00602 A7M00685 A7M00746 A7M00767 A7M00811 A7M00834 A7M00846 A7M00921 DSC00028 DSC00175 DSC00361 DSC00432 DSC00516 DSC00562 DSC00595 DSC00624 DSC00669 DSC00684 DSC00697 DSC00715 DSC00721 DSC00734 DSC00749 select_name';
+        
+        function switchTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // 선택한 탭 활성화
+            if (tabName === 'copy') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('tab-copy').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('tab-extract').classList.add('active');
+            }
+        }
         
         function selectFolder(inputId) {
             document.getElementById(inputId).value = samplePaths[inputId];
         }
         
-        function resetAll() {
+        function resetCopy() {
             document.getElementById('jpgFolder').value = '';
             document.getElementById('rawFolder').value = '';
             document.getElementById('targetFolder').value = '';
             document.getElementById('progressBar').style.width = '0%';
-            document.getElementById('progressBar').classList.remove('animated');
-            document.getElementById('statusText').textContent = '준비 완료';
-            document.getElementById('percentText').textContent = '0%';
-            document.getElementById('detailText').textContent = '파일을 선택해주세요';
+            document.getElementById('currentFile').textContent = '';
+            document.getElementById('speedText').textContent = '속도: 0 MB/s';
+            document.getElementById('timeText').textContent = '남은 시간: 계산 중...';
+            document.getElementById('countText').textContent = '남은 항목: 0개';
         }
         
         function startCopy() {
@@ -285,28 +408,69 @@
                 return;
             }
             
-            document.getElementById('progressBar').classList.add('animated');
-            document.getElementById('statusText').textContent = '복사 중...';
-            
-            const files = ['IMG_001.arw', 'IMG_002.arw', 'IMG_003.arw', 'IMG_004.arw', 'IMG_005.arw'];
+            const files = ['A7M00024.arw', 'A7M00074.arw', 'A7M00087.arw', 'DSC00028.arw', 'DSC00175.arw'];
             let current = 0;
+            const total = 204;
             
             const interval = setInterval(() => {
                 current++;
-                const percent = Math.round((current / files.length) * 100);
-                document.getElementById('percentText').textContent = percent + '%';
-                document.getElementById('statusText').textContent = `복사 중... (${current}/${files.length})`;
-                document.getElementById('detailText').textContent = `파일: ${files[current-1]}`;
+                const percent = Math.round((current / total) * 100);
+                const remaining = total - current;
                 
-                if (current >= files.length) {
+                document.getElementById('progressBar').style.width = percent + '%';
+                document.getElementById('currentFile').textContent = files[current % files.length];
+                document.getElementById('speedText').textContent = `속도: ${(Math.random() * 50 + 10).toFixed(1)} MB/s`;
+                document.getElementById('timeText').textContent = `남은 시간: ${Math.floor(remaining / 10)}분 ${remaining % 60}초`;
+                document.getElementById('countText').textContent = `남은 항목: ${remaining}개`;
+                
+                if (current >= total) {
                     clearInterval(interval);
-                    document.getElementById('progressBar').classList.remove('animated');
-                    document.getElementById('progressBar').style.width = '100%';
-                    document.getElementById('statusText').textContent = '✅ 복사 완료!';
-                    document.getElementById('detailText').textContent = `총 ${files.length}개 파일 복사됨`;
+                    document.getElementById('timeText').textContent = '남은 시간: 완료!';
+                    document.getElementById('currentFile').textContent = '완료';
                     alert('복사가 완료되었습니다! 🎉');
                 }
-            }, 800);
+            }, 50);
+        }
+        
+        function extractFilenames() {
+            const folder = document.getElementById('extractFolder').value;
+            
+            if (!folder) {
+                alert('폴더를 선택해주세요!');
+                return;
+            }
+            
+            document.getElementById('extractStatus').textContent = '추출 중...';
+            document.getElementById('extractProgressBar').style.width = '0%';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                document.getElementById('extractProgressBar').style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('filenameList').value = sampleFilenames;
+                    document.getElementById('extractStatus').textContent = '완료 - 41개 파일명 추출됨';
+                }
+            }, 100);
+        }
+        
+        function copyToClipboard() {
+            const text = document.getElementById('filenameList').value;
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('파일명 목록이 클립보드에 복사되었습니다!');
+                });
+            } else {
+                alert('복사할 파일명이 없습니다.');
+            }
+        }
+        
+        function closeApp() {
+            if (confirm('프로그램을 종료하시겠습니까?')) {
+                window.close();
+            }
         }
     </script>
 </body>
