@@ -41,4 +41,4 @@ build/
 
 # PyInstaller
 *.manifest
-*.spec
+# *.spec  # pyinstaller.spec은 필요
