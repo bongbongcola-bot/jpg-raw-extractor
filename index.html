@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG & RAW Extractor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+            width: 100%;
+            max-width: 650px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .title span {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        .folder-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .folder-row:last-child {
+            margin-bottom: 0;
+        }
+        .folder-label {
+            width: 90px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #495057;
+            flex-shrink: 0;
+        }
+        .folder-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #495057;
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .folder-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .browse-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .button-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .action-btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            flex: 1;
+        }
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+        }
+        .reset-btn {
+            background: #e9ecef;
+            color: #495057;
+        }
+        .reset-btn:hover {
+            background: #dee2e6;
+        }
+        .progress-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 24px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            width: 0%;
+            border-radius: 12px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        .progress-bar.animated {
+            animation: progressAnim 3s ease-in-out infinite;
+        }
+        @keyframes progressAnim {
+            0% { width: 0%; }
+            50% { width: 75%; }
+            100% { width: 100%; }
+        }
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress-status {
+            font-size: 14px;
+            color: #495057;
+            font-weight: 500;
+        }
+        .progress-percent {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .progress-detail {
+            font-size: 12px;
+            color: #adb5bd;
+            margin-top: 10px;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #adb5bd;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .demo-badge {
+            background: #ffc107;
+            color: #1a1a2e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center;">
+            <span class="demo-badge">🎬 UI 미리보기</span>
+        </div>
+        <div class="title"><span>JPG & RAW</span> 파일 추출기</div>
+        
+        <div class="section">
+            <div class="section-title">📁 폴더 선택</div>
+            
+            <div class="folder-row">
+                <div class="folder-label">JPG 폴더</div>
+                <input type="text" class="folder-input" id="jpgFolder" placeholder="JPG 파일이 있는 폴더 선택..." readonly>
+                <button class="browse-btn" onclick="selectFolder('jpgFolder')">Browse</button>
+            </div>
+            
+            <div class="folder-row">
+                <div class="folder-label">RAW 폴더</div>
+                <input type="text" class="folder-input" id="rawFolder" placeholder="RAW 파일이 있는 폴더 선택..." readonly>
+                <button class="browse-btn" onclick="selectFolder('rawFolder')">Browse</button>
+            </div>
+            
+            <div class="folder-row">
+                <div class="folder-label">복사 대상</div>
+                <input type="text" class="folder-input" id="targetFolder" placeholder="복사할 대상 폴더 선택..." readonly>
+                <button class="browse-btn" onclick="selectFolder('targetFolder')">Browse</button>
+            </div>
+        </div>
+        
+        <div class="button-section">
+            <button class="action-btn copy-btn" onclick="startCopy()">🚀 복사 시작</button>
+            <button class="action-btn reset-btn" onclick="resetAll()">🔄 초기화</button>
+        </div>
+        
+        <div class="section progress-section">
+            <div class="section-title">📊 진행 상황</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-info">
+                <div class="progress-status" id="statusText">준비 완료</div>
+                <div class="progress-percent" id="percentText">0%</div>
+            </div>
+            <div class="progress-detail" id="detailText">파일을 선택해주세요</div>
+        </div>
+        
+        <div class="footer">
+            Made with ❤️ by <a href="https://github.com/bongbongcola-bot/jpg-raw-extractor">bongbongcola-bot</a>
+        </div>
+    </div>
+
+    <script>
+        const samplePaths = {
+            jpgFolder: '/Users/sample/Pictures/JPG',
+            rawFolder: '/Users/sample/Pictures/RAW',
+            targetFolder: '/Users/sample/Pictures/Selected'
+        };
+        
+        function selectFolder(inputId) {
+            document.getElementById(inputId).value = samplePaths[inputId];
+        }
+        
+        function resetAll() {
+            document.getElementById('jpgFolder').value = '';
+            document.getElementById('rawFolder').value = '';
+            document.getElementById('targetFolder').value = '';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressBar').classList.remove('animated');
+            document.getElementById('statusText').textContent = '준비 완료';
+            document.getElementById('percentText').textContent = '0%';
+            document.getElementById('detailText').textContent = '파일을 선택해주세요';
+        }
+        
+        function startCopy() {
+            const jpgFolder = document.getElementById('jpgFolder').value;
+            const rawFolder = document.getElementById('rawFolder').value;
+            const targetFolder = document.getElementById('targetFolder').value;
+            
+            if (!jpgFolder || !rawFolder || !targetFolder) {
+                alert('모든 폴더를 선택해주세요!');
+                return;
+            }
+            
+            document.getElementById('progressBar').classList.add('animated');
+            document.getElementById('statusText').textContent = '복사 중...';
+            
+            const files = ['IMG_001.arw', 'IMG_002.arw', 'IMG_003.arw', 'IMG_004.arw', 'IMG_005.arw'];
+            let current = 0;
+            
+            const interval = setInterval(() => {
+                current++;
+                const percent = Math.round((current / files.length) * 100);
+                document.getElementById('percentText').textContent = percent + '%';
+                document.getElementById('statusText').textContent = `복사 중... (${current}/${files.length})`;
+                document.getElementById('detailText').textContent = `파일: ${files[current-1]}`;
+                
+                if (current >= files.length) {
+                    clearInterval(interval);
+                    document.getElementById('progressBar').classList.remove('animated');
+                    document.getElementById('progressBar').style.width = '100%';
+                    document.getElementById('statusText').textContent = '✅ 복사 완료!';
+                    document.getElementById('detailText').textContent = `총 ${files.length}개 파일 복사됨`;
+                    alert('복사가 완료되었습니다! 🎉');
+                }
+            }, 800);
+        }
+    </script>
+</body>
+</html>
