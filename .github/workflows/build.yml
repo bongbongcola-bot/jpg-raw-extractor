@@ -1,0 +1,99 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Build EXE
+      run: |
+        pyinstaller pyinstaller.spec
+    
+    - name: Zip EXE
+      shell: powershell
+      run: |
+        Compress-Archive -Path dist\jpg-raw-extractor.exe -DestinationPath dist\jpg-raw-extractor-windows.zip
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-exe
+        path: dist/jpg-raw-extractor-windows.zip
+
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Build APP
+      run: |
+        pyinstaller pyinstaller.spec
+    
+    - name: Zip APP
+      run: |
+        cd dist && zip -r jpg-raw-extractor-macos.zip jpg-raw-extractor.app && cd ..
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: macos-app
+        path: dist/jpg-raw-extractor-macos.zip
+
+  create-release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download Windows artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: windows-exe
+        path: ./release-files
+    
+    - name: Download macOS artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: macos-app
+        path: ./release-files
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ./release-files/jpg-raw-extractor-windows.zip
+          ./release-files/jpg-raw-extractor-macos.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
