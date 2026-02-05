@@ -24,7 +24,7 @@
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             width: 100%;
-            max-width: 750px;
+            max-width: 800px;
             overflow: hidden;
         }
         .title {
@@ -91,17 +91,22 @@
             letter-spacing: 1px;
             margin-bottom: 15px;
         }
+        
+        /* 폴더 행 - 테이블 형식 */
+        .folder-table {
+            width: 100%;
+        }
         .folder-row {
             display: flex;
             align-items: center;
-            gap: 12px;
             margin-bottom: 12px;
+            width: 100%;
         }
         .folder-row:last-child {
             margin-bottom: 0;
         }
         .folder-label {
-            width: 80px;
+            width: 90px;
             font-size: 13px;
             font-weight: 500;
             color: #495057;
@@ -115,7 +120,8 @@
             font-size: 12px;
             color: #495057;
             background: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            margin: 0 12px;
+            min-width: 0;
         }
         .folder-input:focus {
             outline: none;
@@ -123,19 +129,20 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         .browse-btn {
-            padding: 10px 16px;
-            background: #e9ecef;
-            color: #495057;
-            border: 1px solid #dee2e6;
+            padding: 10px 20px;
+            background: #0078d4;
+            color: white;
+            border: none;
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            min-width: 70px;
+            min-width: 90px;
+            flex-shrink: 0;
         }
         .browse-btn:hover {
-            background: #dee2e6;
+            background: #005a9e;
         }
         
         /* 파일 정보 */
@@ -175,6 +182,8 @@
             font-size: 12px;
             color: #6c757d;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         /* 버튼 섹션 */
@@ -182,6 +191,7 @@
             display: flex;
             justify-content: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
         .action-btn {
             padding: 12px 30px;
@@ -192,26 +202,10 @@
             cursor: pointer;
             transition: all 0.2s;
             min-width: 100px;
-        }
-        .start-btn {
             background: #fff;
             color: #495057;
         }
-        .start-btn:hover {
-            background: #f8f9fa;
-        }
-        .reset-btn {
-            background: #fff;
-            color: #495057;
-        }
-        .reset-btn:hover {
-            background: #f8f9fa;
-        }
-        .close-btn {
-            background: #fff;
-            color: #495057;
-        }
-        .close-btn:hover {
+        .action-btn:hover {
             background: #f8f9fa;
         }
         
@@ -262,6 +256,28 @@
             color: #667eea;
             text-decoration: none;
         }
+        
+        /* 모바일 반응형 */
+        @media (max-width: 600px) {
+            .folder-row {
+                flex-wrap: wrap;
+            }
+            .folder-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .folder-input {
+                margin: 0 0 10px 0;
+                width: 100%;
+            }
+            .browse-btn {
+                width: 100%;
+            }
+            .progress-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
@@ -282,22 +298,24 @@
             <div class="section">
                 <div class="section-title">📁 폴더 선택</div>
                 
-                <div class="folder-row">
-                    <div class="folder-label">jpg</div>
-                    <input type="text" class="folder-input" id="jpgFolder" placeholder="JPG 파일이 있는 폴더..." readonly>
-                    <button class="browse-btn" onclick="selectFolder('jpgFolder')">jpg</button>
-                </div>
-                
-                <div class="folder-row">
-                    <div class="folder-label">Raw_arw</div>
-                    <input type="text" class="folder-input" id="rawFolder" placeholder="RAW 파일이 있는 폴더..." readonly>
-                    <button class="browse-btn" onclick="selectFolder('rawFolder')">raw</button>
-                </div>
-                
-                <div class="folder-row">
-                    <div class="folder-label">Copy_url</div>
-                    <input type="text" class="folder-input" id="targetFolder" placeholder="복사할 대상 폴더..." readonly>
-                    <button class="browse-btn" onclick="selectFolder('targetFolder')">copy_url</button>
+                <div class="folder-table">
+                    <div class="folder-row">
+                        <div class="folder-label">jpg</div>
+                        <input type="text" class="folder-input" id="jpgFolder" placeholder="JPG 파일이 있는 폴더..." readonly>
+                        <button class="browse-btn" onclick="selectFolder('jpgFolder')">jpg</button>
+                    </div>
+                    
+                    <div class="folder-row">
+                        <div class="folder-label">Raw_arw</div>
+                        <input type="text" class="folder-input" id="rawFolder" placeholder="RAW 파일이 있는 폴더..." readonly>
+                        <button class="browse-btn" onclick="selectFolder('rawFolder')">raw</button>
+                    </div>
+                    
+                    <div class="folder-row">
+                        <div class="folder-label">Copy_url</div>
+                        <input type="text" class="folder-input" id="targetFolder" placeholder="복사할 대상 폴더..." readonly>
+                        <button class="browse-btn" onclick="selectFolder('targetFolder')">copy_url</button>
+                    </div>
                 </div>
             </div>
             
@@ -317,9 +335,9 @@
             </div>
             
             <div class="button-section">
-                <button class="action-btn start-btn" onclick="startCopy()">Start</button>
-                <button class="action-btn reset-btn" onclick="resetCopy()">초기화</button>
-                <button class="action-btn close-btn" onclick="closeApp()">Close</button>
+                <button class="action-btn" onclick="startCopy()">Start</button>
+                <button class="action-btn" onclick="resetCopy()">초기화</button>
+                <button class="action-btn" onclick="closeApp()">Close</button>
             </div>
         </div>
         
@@ -328,10 +346,12 @@
             <div class="section">
                 <div class="section-title">📁 폴더 선택</div>
                 
-                <div class="folder-row">
-                    <div class="folder-label">선택 폴더</div>
-                    <input type="text" class="folder-input" id="extractFolder" placeholder="파일명을 추출할 폴더..." readonly>
-                    <button class="browse-btn" onclick="selectFolder('extractFolder')">찾아보기</button>
+                <div class="folder-table">
+                    <div class="folder-row">
+                        <div class="folder-label">선택 폴더</div>
+                        <input type="text" class="folder-input" id="extractFolder" placeholder="파일명을 추출할 폴더..." readonly>
+                        <button class="browse-btn" onclick="selectFolder('extractFolder')">찾아보기</button>
+                    </div>
                 </div>
             </div>
             
@@ -347,9 +367,9 @@
             <div class="status-text" id="extractStatus">준비</div>
             
             <div class="button-section">
-                <button class="action-btn start-btn" onclick="extractFilenames()">파일명 추출</button>
-                <button class="action-btn reset-btn" onclick="copyToClipboard()">클립보드 복사</button>
-                <button class="action-btn close-btn" onclick="closeApp()">Close</button>
+                <button class="action-btn" onclick="extractFilenames()">파일명 추출</button>
+                <button class="action-btn" onclick="copyToClipboard()">클립보드 복사</button>
+                <button class="action-btn" onclick="closeApp()">Close</button>
             </div>
         </div>
         
@@ -369,11 +389,9 @@
         const sampleFilenames = 'A7M00024 A7M00074 A7M00087 A7M00102 A7M00116 A7M00187 A7M00195 A7M00219 A7M00283 A7M00307 A7M00331 A7M00335 A7M00340 A7M00416 A7M00434 A7M00451 A7M00561 A7M00602 A7M00685 A7M00746 A7M00767 A7M00811 A7M00834 A7M00846 A7M00921 DSC00028 DSC00175 DSC00361 DSC00432 DSC00516 DSC00562 DSC00595 DSC00624 DSC00669 DSC00684 DSC00697 DSC00715 DSC00721 DSC00734 DSC00749 select_name';
         
         function switchTab(tabName) {
-            // 모든 탭 비활성화
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
-            // 선택한 탭 활성화
             if (tabName === 'copy') {
                 document.querySelectorAll('.tab')[0].classList.add('active');
                 document.getElementById('tab-copy').classList.add('active');
